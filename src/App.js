@@ -10,9 +10,9 @@ export default function App() {
   const [mode, setMode] = useState('');
   const [gameStarted, setGameStarted] = useState(false);
   const [namesSubmitted, setNamesSubmitted] = useState(false);
-  const [playerX, setPlayerX] = useState('Player X');
-  const [playerO, setPlayerO] = useState('Player O');
-  const [matchNumber, setMatchNumber] = useState(1); // 🆕 match tracking
+  const [playerX, setPlayerX] = useState('');
+  const [playerO, setPlayerO] = useState('');
+  const [matchNumber, setMatchNumber] = useState(1);
 
   const winner = calculateWinner(squares);
   const isDraw = squares.every(Boolean) && !winner;
@@ -44,28 +44,40 @@ export default function App() {
 
   const handleNextGame = () => {
     handleRestart();
-    setMatchNumber((prev) => prev + 1); // 🆕 increment match number
+    setMatchNumber((prev) => prev + 1);
   };
 
   const handleModeSelection = (selectedMode) => {
     setMode(selectedMode);
     setGameStarted(true);
     setNamesSubmitted(false);
-    setMatchNumber(1); // 🆕 reset match number
+    setPlayerX('');
+    setPlayerO('');
+    setMatchNumber(1);
     handleRestart();
-    if (selectedMode === 'PvC') {
-      setPlayerO('Computer');
-    } else {
-      setPlayerO('Player O');
-    }
   };
 
   const handleSubmitNames = () => {
-    if (playerX.trim() && (mode === 'PvC' || playerO.trim())) {
-      setNamesSubmitted(true);
-    } else {
-      alert('Please enter valid player name(s).');
+    const trimmedX = playerX.trim();
+    const trimmedO = playerO.trim();
+
+    if (
+      trimmedX === '' ||
+      trimmedX.toLowerCase() === 'player x' ||
+      (mode === 'PvP' &&
+        (trimmedO === '' || trimmedO.toLowerCase() === 'player o'))
+    ) {
+      alert('Please enter valid custom player name(s).');
+      return;
     }
+
+    if (mode === 'PvC' && trimmedO === '') {
+      setPlayerO('Computer');
+    }
+
+    setPlayerX(trimmedX);
+    setPlayerO(mode === 'PvC' ? 'Computer' : trimmedO);
+    setNamesSubmitted(true);
   };
 
   const getDisplayName = (symbol) =>
@@ -76,11 +88,15 @@ export default function App() {
       {!gameStarted ? (
         <div className="start-screen">
           <h1 className="title">🎮 Welcome to Tic Tac Toe</h1>
-          <p>Challenge your friends or test your skills against the computer in this timeless classic.</p>
+          <p>Challenge your friends or test your skills against the computer.</p>
           <p>Select your game mode:</p>
           <div className="button-group">
-            <button onClick={() => handleModeSelection('PvP')} className="button">🧑‍🤝‍🧑 Player vs Player</button>
-            <button onClick={() => handleModeSelection('PvC')} className="button">🤖 Player vs Computer</button>
+            <button onClick={() => handleModeSelection('PvP')} className="button">
+              🧑‍🤝‍🧑 Player vs Player
+            </button>
+            <button onClick={() => handleModeSelection('PvC')} className="button">
+              🤖 Player vs Computer
+            </button>
           </div>
         </div>
       ) : !namesSubmitted ? (
@@ -105,11 +121,13 @@ export default function App() {
             )}
           </div>
           <div className="button-group vertical">
-            <button onClick={handleSubmitNames} className="button">✅ Start Game</button>
+            <button onClick={handleSubmitNames} className="button">
+              ✅ Start Game
+            </button>
             <button
               onClick={() => {
                 setGameStarted(false);
-                setMatchNumber(1); // reset on back
+                setMatchNumber(1);
               }}
               className="button"
             >
@@ -120,10 +138,7 @@ export default function App() {
       ) : (
         <div className="card">
           <h1 className="title">🎯 Tic Tac Toe</h1>
-
-          {/* 🆕 Match display */}
           <div className="match-number">🎲 Match {matchNumber}</div>
-
           <div className="status">
             {winner
               ? `🏆 Winner: ${getDisplayName(winner)} (${winner})`
@@ -135,18 +150,20 @@ export default function App() {
                 : 'Computer\'s Turn (O)'
               : `${getDisplayName(currentPlayer)}'s Turn (${currentPlayer})`}
           </div>
-
           <Board squares={squares} onSquareClick={handleSquareClick} />
-
           <div className="button-group vertical">
             {(winner || isDraw) && (
-              <button onClick={handleNextGame} className="button">⏭️ Next Match</button>
+              <button onClick={handleNextGame} className="button">
+                ⏭️ Next Match
+              </button>
             )}
-            <button onClick={handleRestart} className="button">🔁 Restart Game</button>
+            <button onClick={handleRestart} className="button">
+              🔁 Restart Game
+            </button>
             <button
               onClick={() => {
                 setGameStarted(false);
-                setMatchNumber(1); // reset on back
+                setMatchNumber(1);
               }}
               className="button"
             >
