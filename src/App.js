@@ -1,189 +1,77 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Board from './components/Board';
 import calculateWinner from './utils/calculateWinner';
 import makeComputerMove from './utils/makeComputerMove';
 import './App.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App() {
+  const [gridSize] = useState(3); // Fixed 3x3 grid
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
-  const [mode, setMode] = useState('');
-  const [gameStarted, setGameStarted] = useState(false);
-  const [namesSubmitted, setNamesSubmitted] = useState(false);
-  const [playerX, setPlayerX] = useState('');
-  const [playerO, setPlayerO] = useState('');
-  const [matchNumber, setMatchNumber] = useState(1);
-
-  const winner = calculateWinner(squares);
-  const isDraw = squares.every(Boolean) && !winner;
-  const currentPlayer = xIsNext ? 'X' : 'O';
-
-  // 🔊 Sound references
-  const popSound = useRef(null);
-  const winSound = useRef(null);
-  const loseSound = useRef(null);
-  const drawSound = useRef(null);
-  const buttonSound = useRef(null);
+  const [mode, setMode] = useState('player'); // 'player' or 'computer'
+  const [gameOver, setGameOver] = useState(false);
+  const playerX = 'Player X';
+  const playerO = mode === 'computer' ? 'Computer' : 'Player O';
 
   useEffect(() => {
-    if (mode === 'PvC' && !xIsNext && !winner && !isDraw) {
-      const timeout = setTimeout(() => {
-        const newSquares = makeComputerMove(squares);
+    if (mode === 'computer' && !xIsNext && !gameOver) {
+      const computerMove = makeComputerMove(squares, gridSize);
+      if (computerMove !== -1) {
+        const newSquares = squares.slice();
+        newSquares[computerMove] = 'O';
         setSquares(newSquares);
         setXIsNext(true);
-        popSound.current.play();
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [xIsNext, squares, mode, winner, isDraw]);
-
-  useEffect(() => {
-    if (winner) {
-      if (mode === 'PvC' && winner === 'O') {
-        loseSound.current.play();
-      } else {
-        winSound.current.play();
       }
-    } else if (isDraw) {
-      drawSound.current.play();
     }
-  }, [winner, isDraw]);
+  }, [squares, gridSize, xIsNext, gameOver, mode]);
 
-  const handleSquareClick = (i) => {
-    if (squares[i] || winner || (mode === 'PvC' && !xIsNext)) return;
-    const nextSquares = squares.slice();
-    nextSquares[i] = currentPlayer;
-    setSquares(nextSquares);
+  const handleClick = (i) => {
+    if (squares[i] || gameOver || (mode === 'computer' && !xIsNext)) return;
+
+    const newSquares = squares.slice();
+    newSquares[i] = xIsNext ? 'X' : 'O';
+    setSquares(newSquares);
     setXIsNext(!xIsNext);
-    popSound.current.play();
-  };
 
-  const handleButtonClick = (action) => {
-    buttonSound.current.play();
-    action();
-  };
-
-  const handleRestart = () => {
-    setSquares(Array(9).fill(null));
-    setXIsNext(true);
-  };
-
-  const handleNextGame = () => {
-    handleRestart();
-    setMatchNumber((prev) => prev + 1);
-  };
-
-  const handleModeSelection = (selectedMode) => {
-    buttonSound.current.play();
-    setMode(selectedMode);
-    setGameStarted(true);
-    setNamesSubmitted(false);
-    setMatchNumber(1);
-    handleRestart();
-    setPlayerO(selectedMode === 'PvC' ? 'Computer' : '');
-  };
-
-  const handleSubmitNames = () => {
-    if (playerX.trim() && (mode === 'PvC' || playerO.trim())) {
-      buttonSound.current.play();
-      setNamesSubmitted(true);
-    } else {
-      alert('Please enter valid player name(s).');
+    const winner = calculateWinner(newSquares, gridSize);
+    if (winner) {
+      setGameOver(true);
+      toast.success(`🎉 ${winner === 'X' ? playerX : playerO} wins!`);
+    } else if (!newSquares.includes(null)) {
+      setGameOver(true);
+      toast.info('It’s a draw!');
     }
   };
 
-  const getDisplayName = (symbol) =>
-    symbol === 'X' ? playerX : symbol === 'O' ? playerO : '';
+  const handleReset = () => {
+    setSquares(Array(gridSize * gridSize).fill(null));
+    setXIsNext(true);
+    setGameOver(false);
+  };
 
   return (
-    <div className="app-container">
-      {/* 🔊 Audio Elements */}
-      <audio ref={popSound} src="/sounds/pop.mp3" />
-      <audio ref={winSound} src="/sounds/win.mp3" />
-      <audio ref={loseSound} src="/sounds/lose.mp3" />
-      <audio ref={drawSound} src="/sounds/draw.wav" />
-      <audio ref={buttonSound} src="/sounds/light-switch.mp3" />
+    <div className="app">
+      <h1>Tic Tac Toe</h1>
 
-      {!gameStarted ? (
-        <div className="start-screen">
-          <h1 className="title">🎮 Welcome to Tic Tac Toe</h1>
-          <p>Select your game mode:</p>
-          <div className="button-group">
-            <button onClick={() => handleModeSelection('PvP')} className="button">🧑‍🤝‍🧑 Player vs Player</button>
-            <button onClick={() => handleModeSelection('PvC')} className="button">🤖 Player vs Computer</button>
-          </div>
-        </div>
-      ) : !namesSubmitted ? (
-        <div className="card">
-          <h1 className="title">📝 Enter Player Name{mode === 'PvP' ? 's' : ''}</h1>
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Your Username (X)"
-              value={playerX}
-              onChange={(e) => setPlayerX(e.target.value)}
-              className="input"
-            />
-            {mode === 'PvP' && (
-              <input
-                type="text"
-                placeholder="Player O name"
-                value={playerO}
-                onChange={(e) => setPlayerO(e.target.value)}
-                className="input"
-              />
-            )}
-          </div>
-          <div className="button-group vertical">
-            <button onClick={handleSubmitNames} className="button">✅ Start Game</button>
-            <button
-              onClick={() => handleButtonClick(() => {
-                setGameStarted(false);
-                setMatchNumber(1);
-              })}
-              className="button"
-            >
-              🏠 Back to Menu
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="card">
-          <h1 className="title">🎯 Tic Tac Toe</h1>
-          <div className="match-number">🎲 Match {matchNumber}</div>
-          <div className="status">
-            {winner
-              ? `🏆 Winner: ${getDisplayName(winner)} (${winner})`
-              : isDraw
-              ? '🤝 It\'s a Draw!'
-              : mode === 'PvC'
-              ? xIsNext
-                ? `${playerX}'s Turn (X)`
-                : 'Computer\'s Turn (O)'
-              : `${getDisplayName(currentPlayer)}'s Turn (${currentPlayer})`}
-          </div>
+      <div className="mode-buttons">
+        <button onClick={() => setMode('player')}>2 Players</button>
+        <button onClick={() => setMode('computer')}>vs Computer</button>
+      </div>
 
-          <Board squares={squares} onSquareClick={handleSquareClick} />
+      <Board
+        squares={squares}
+        onClick={handleClick}
+        gridSize={gridSize}
+      />
 
-          <div className="button-group vertical">
-            {(winner || isDraw) && (
-              <button onClick={() => handleButtonClick(handleNextGame)} className="button">
-                ⏭️ Next Match
-              </button>
-            )}
-            <button onClick={() => handleButtonClick(handleRestart)} className="button">🔁 Restart Game</button>
-            <button
-              onClick={() => handleButtonClick(() => {
-                setGameStarted(false);
-                setMatchNumber(1);
-              })}
-              className="button"
-            >
-              🏠 Back to Menu
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="info">
+        <p>Next: {xIsNext ? playerX : playerO}</p>
+        <button onClick={handleReset}>Reset Game</button>
+      </div>
+
+      <ToastContainer position="bottom-center" />
     </div>
   );
 }
