@@ -109,8 +109,8 @@ export default function App() {
           <h1 className="title">🎮 Welcome to Tic Tac Toe</h1>
           <p>Select your game mode:</p>
           <div className="button-group">
-            <button onClick={() => handleModeSelection('PvP')} className="button">🧑‍🤝‍🧑 PvP</button>
-            <button onClick={() => handleModeSelection('PvC')} className="button">🤖 PvC</button>
+            <button onClick={() => handleModeSelection('PvP')} className="button">🧑‍🤝‍🧑 Player vs Player</button>
+            <button onClick={() => handleModeSelection('PvC')} className="button">🤖 Player vs Computer</button>
           </div>
         </div>
       ) : !namesSubmitted ? (
