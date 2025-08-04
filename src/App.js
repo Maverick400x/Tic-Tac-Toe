@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Board from './components/Board';
 import calculateWinner from './utils/calculateWinner';
 import makeComputerMove from './utils/makeComputerMove';
@@ -18,16 +18,36 @@ export default function App() {
   const isDraw = squares.every(Boolean) && !winner;
   const currentPlayer = xIsNext ? 'X' : 'O';
 
+  // 🔊 Sound references
+  const popSound = useRef(null);
+  const winSound = useRef(null);
+  const loseSound = useRef(null);
+  const drawSound = useRef(null);
+  const buttonSound = useRef(null);
+
   useEffect(() => {
     if (mode === 'PvC' && !xIsNext && !winner && !isDraw) {
       const timeout = setTimeout(() => {
         const newSquares = makeComputerMove(squares);
         setSquares(newSquares);
         setXIsNext(true);
+        popSound.current.play();
       }, 500);
       return () => clearTimeout(timeout);
     }
   }, [xIsNext, squares, mode, winner, isDraw]);
+
+  useEffect(() => {
+    if (winner) {
+      if (mode === 'PvC' && winner === 'O') {
+        loseSound.current.play();
+      } else {
+        winSound.current.play();
+      }
+    } else if (isDraw) {
+      drawSound.current.play();
+    }
+  }, [winner, isDraw]);
 
   const handleSquareClick = (i) => {
     if (squares[i] || winner || (mode === 'PvC' && !xIsNext)) return;
@@ -35,6 +55,12 @@ export default function App() {
     nextSquares[i] = currentPlayer;
     setSquares(nextSquares);
     setXIsNext(!xIsNext);
+    popSound.current.play();
+  };
+
+  const handleButtonClick = (action) => {
+    buttonSound.current.play();
+    action();
   };
 
   const handleRestart = () => {
@@ -48,36 +74,22 @@ export default function App() {
   };
 
   const handleModeSelection = (selectedMode) => {
+    buttonSound.current.play();
     setMode(selectedMode);
     setGameStarted(true);
     setNamesSubmitted(false);
-    setPlayerX('');
-    setPlayerO('');
     setMatchNumber(1);
     handleRestart();
+    setPlayerO(selectedMode === 'PvC' ? 'Computer' : '');
   };
 
   const handleSubmitNames = () => {
-    const trimmedX = playerX.trim();
-    const trimmedO = playerO.trim();
-
-    if (
-      trimmedX === '' ||
-      trimmedX.toLowerCase() === 'player x' ||
-      (mode === 'PvP' &&
-        (trimmedO === '' || trimmedO.toLowerCase() === 'player o'))
-    ) {
-      alert('Please enter valid custom player name(s).');
-      return;
+    if (playerX.trim() && (mode === 'PvC' || playerO.trim())) {
+      buttonSound.current.play();
+      setNamesSubmitted(true);
+    } else {
+      alert('Please enter valid player name(s).');
     }
-
-    if (mode === 'PvC' && trimmedO === '') {
-      setPlayerO('Computer');
-    }
-
-    setPlayerX(trimmedX);
-    setPlayerO(mode === 'PvC' ? 'Computer' : trimmedO);
-    setNamesSubmitted(true);
   };
 
   const getDisplayName = (symbol) =>
@@ -85,18 +97,20 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* 🔊 Audio Elements */}
+      <audio ref={popSound} src="/sounds/pop.mp3" />
+      <audio ref={winSound} src="/sounds/win.mp3" />
+      <audio ref={loseSound} src="/sounds/lose.mp3" />
+      <audio ref={drawSound} src="/sounds/draw.wav" />
+      <audio ref={buttonSound} src="/sounds/light-switch.mp3" />
+
       {!gameStarted ? (
         <div className="start-screen">
           <h1 className="title">🎮 Welcome to Tic Tac Toe</h1>
-          <p>Challenge your friends or test your skills against the computer.</p>
           <p>Select your game mode:</p>
           <div className="button-group">
-            <button onClick={() => handleModeSelection('PvP')} className="button">
-              🧑‍🤝‍🧑 Player vs Player
-            </button>
-            <button onClick={() => handleModeSelection('PvC')} className="button">
-              🤖 Player vs Computer
-            </button>
+            <button onClick={() => handleModeSelection('PvP')} className="button">🧑‍🤝‍🧑 PvP</button>
+            <button onClick={() => handleModeSelection('PvC')} className="button">🤖 PvC</button>
           </div>
         </div>
       ) : !namesSubmitted ? (
@@ -105,7 +119,7 @@ export default function App() {
           <div className="input-group">
             <input
               type="text"
-              placeholder="Player X name"
+              placeholder="Your Username (X)"
               value={playerX}
               onChange={(e) => setPlayerX(e.target.value)}
               className="input"
@@ -121,14 +135,12 @@ export default function App() {
             )}
           </div>
           <div className="button-group vertical">
-            <button onClick={handleSubmitNames} className="button">
-              ✅ Start Game
-            </button>
+            <button onClick={handleSubmitNames} className="button">✅ Start Game</button>
             <button
-              onClick={() => {
+              onClick={() => handleButtonClick(() => {
                 setGameStarted(false);
                 setMatchNumber(1);
-              }}
+              })}
               className="button"
             >
               🏠 Back to Menu
@@ -150,21 +162,21 @@ export default function App() {
                 : 'Computer\'s Turn (O)'
               : `${getDisplayName(currentPlayer)}'s Turn (${currentPlayer})`}
           </div>
+
           <Board squares={squares} onSquareClick={handleSquareClick} />
+
           <div className="button-group vertical">
             {(winner || isDraw) && (
-              <button onClick={handleNextGame} className="button">
+              <button onClick={() => handleButtonClick(handleNextGame)} className="button">
                 ⏭️ Next Match
               </button>
             )}
-            <button onClick={handleRestart} className="button">
-              🔁 Restart Game
-            </button>
+            <button onClick={() => handleButtonClick(handleRestart)} className="button">🔁 Restart Game</button>
             <button
-              onClick={() => {
+              onClick={() => handleButtonClick(() => {
                 setGameStarted(false);
                 setMatchNumber(1);
-              }}
+              })}
               className="button"
             >
               🏠 Back to Menu
