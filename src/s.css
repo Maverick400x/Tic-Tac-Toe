@@ -1,0 +1,238 @@
+General Reset
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* App Container */
+.app-container {
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* Start Screen */
+.start-screen {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 40px 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Title */
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #ffdd57;
+}
+
+/* Description */
+p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.button-group.vertical {
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Buttons */
+.button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #ffdd57;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  min-width: 180px;
+}
+
+.button:hover {
+  background-color: #ffe477;
+  transform: scale(1.05);
+}
+
+/* Game Card */
+.card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  margin-top: 20px;
+}
+
+/* Input Group */
+.input-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+/* Inputs */
+.input {
+  padding: 10px;
+  border: 2px solid #ffdd57;
+  border-radius: 6px;
+  width: 200px;
+  background-color: #fff;
+  color: #222;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ffe477;
+}
+
+/* Status */
+.status {
+  margin: 20px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Scoreboard */
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.score {
+  font-size: 1.1rem;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid #ffdd57;
+  color: #ffdd57;
+}
+
+.X-score {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.O-score {
+  background-color: rgba(0, 0, 255, 0.1);
+}
+
+/* Game Board */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  justify-content: center;
+  margin: 20px auto;
+  max-width: 320px;
+}
+
+.square {
+  width: 100px;
+  height: 100px;
+  font-size: 2rem;
+  font-weight: bold;
+  background-color: #fff;
+  color: #2a5298;
+  border: 2px solid #ffdd57;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  animation: fadeInMove 0.3s ease-in;
+}
+
+/* Hover Effect */
+.square:hover {
+  background-color: #ffe477;
+}
+
+/* WINNING Square Animation */
+.square.win {
+  background-color: #4caf50 !important;
+  color: white !important;
+  animation: scaleWin 0.4s ease-in-out infinite alternate;
+}
+
+/* Animations */
+@keyframes fadeInMove {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleWin {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+  }
+}
+
+/* Responsive Tweaks */
+@media (max-width: 600px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .button {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+  }
+
+  .square {
+    width: 80px;
+    height: 80px;
+    font-size: 1.8rem;
+  }
+
+  .input {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .score {
+    font-size: 1rem;
+    padding: 6px 12px;
+  }
+
+  .button-group.vertical .button {
+    min-width: 140px;
+  }
+}
