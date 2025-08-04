@@ -1,70 +1,50 @@
-# Getting Started with Create React App
+# 🎮 Tic-Tac-Toe
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**A classic game of Tic-Tac-Toe with multiple gameplay modes, dynamic game logic, and a clean, responsive user interface.**
 
-## Available Scripts
+### ✨ Features
 
-In the project directory, you can run:
+#### Gameplay Modes
 
-### `npm start`
+* **Player vs Player (PvP):** **Challenge a friend to a classic two-player match.**
+* **Player vs Computer (PvC):** **Test your skills against a basic AI opponent.**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#### Player Customization
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* **Players can** **enter their names** **on the start screen.**
+* **In PvC mode, Player O's name is automatically set to**  **"Computer"** **.**
+* **Player X must change their name** **from the default "Player X" to proceed, ensuring a personalized experience.**
 
-### `npm test`
+#### Game Logic
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **The game** **tracks and displays the current player** **for each turn.**
+* **It automatically determines and announces the**  **Winner** **, a**  **Draw** **, or a** **Loss** **(in PvC mode).**
+* **Invalid moves are prevented** **, so players cannot click on filled or disabled squares.**
+* **The** **computer's move is automatically played** **in PvC mode after the human player's turn.**
 
-### `npm run build`
+#### Game Controls
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* **Restart Game:** **Instantly clear the board and start a new match with the same players.**
+* **Next Match:** **Play another round, incrementing the match counter.**
+* **Back to Menu:** **Return to the start screen to select a new game mode or change player names.**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Sound Effects
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* **Click Sound:** **A satisfying "light-switch" sound plays on all button and square presses.**
+* **Win Sound:** **A celebratory sound effect is triggered when a player wins.**
+* **Lose Sound:** **A distinct sound plays if the human player is defeated by the computer.**
+* **Draw Sound:** **A special sound effect signals a draw.**
 
-### `npm run eject`
+#### User Interface
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+* **The application features a** **clean and responsive UI** **with conditional rendering for different views:**
+  * **Start Screen**
+  * **Name Entry Form**
+  * **Game Board**
+* **The** **match number** **is clearly displayed during the game.**
+* **Turn status and result messages** **update dynamically to keep players informed.**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Utility Integration
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+* **The game uses a** **`<span class="selected">calculateWinner</span>`** **function to efficiently determine the outcome of each match.**
+* **A** **`<span class="selected">makeComputerMove</span>`** **function provides the logic for the basic AI in PvC mode.**
