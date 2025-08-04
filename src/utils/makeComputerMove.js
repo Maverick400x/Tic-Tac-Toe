@@ -1,63 +1,61 @@
 import calculateWinner from './calculateWinner';
 
 export default function makeComputerMove(squares) {
-  const newSquares = [...squares];
+  const bestMove = getBestMove(squares, 'O');
+  if (bestMove !== -1) {
+    const newSquares = [...squares];
+    newSquares[bestMove] = 'O';
+    return newSquares;
+  }
+  return squares;
+}
 
-  // Helper to simulate a move and check for winner
-  const tryMove = (idx, symbol) => {
-    const temp = [...squares];
-    temp[idx] = symbol;
-    return calculateWinner(temp) === symbol;
-  };
+function getBestMove(board, player) {
+  let bestScore = -Infinity;
+  let move = -1;
 
-  const emptyIndices = squares
-    .map((val, idx) => (val === null ? idx : null))
-    .filter((val) => val !== null);
-
-  if (emptyIndices.length === 0) return squares;
-
-  // 1. Win if possible
-  for (let idx of emptyIndices) {
-    if (tryMove(idx, 'O')) {
-      newSquares[idx] = 'O';
-      return newSquares;
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === null) {
+      board[i] = player;
+      const score = minimax(board, 0, false);
+      board[i] = null;
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
     }
   }
 
-  // 2. Block opponent's winning move
-  for (let idx of emptyIndices) {
-    if (tryMove(idx, 'X')) {
-      newSquares[idx] = 'O';
-      return newSquares;
+  return move;
+}
+
+function minimax(board, depth, isMaximizing) {
+  const winner = calculateWinner(board);
+  if (winner === 'O') return 10 - depth;
+  if (winner === 'X') return depth - 10;
+  if (board.every(cell => cell !== null)) return 0; // Draw
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        board[i] = 'O';
+        const score = minimax(board, depth + 1, false);
+        board[i] = null;
+        bestScore = Math.max(bestScore, score);
+      }
     }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        board[i] = 'X';
+        const score = minimax(board, depth + 1, true);
+        board[i] = null;
+        bestScore = Math.min(bestScore, score);
+      }
+    }
+    return bestScore;
   }
-
-  // 3. Take center if available
-  if (squares[4] === null) {
-    newSquares[4] = 'O';
-    return newSquares;
-  }
-
-  // 4. Take a corner
-  const corners = [0, 2, 6, 8];
-  const availableCorners = corners.filter(i => squares[i] === null);
-  if (availableCorners.length) {
-    const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
-    newSquares[randomCorner] = 'O';
-    return newSquares;
-  }
-
-  // 5. Take any side
-  const sides = [1, 3, 5, 7];
-  const availableSides = sides.filter(i => squares[i] === null);
-  if (availableSides.length) {
-    const randomSide = availableSides[Math.floor(Math.random() * availableSides.length)];
-    newSquares[randomSide] = 'O';
-    return newSquares;
-  }
-
-  // Fallback: random (should never hit this)
-  const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-  newSquares[randomIndex] = 'O';
-  return newSquares;
 }
